@@ -7,16 +7,19 @@ metadata:
   labels:
     cnrm.cloud.google.com/managed-by-kcc: "true"
     cnrm.cloud.google.com/system: "true"
-  name: kmsautokeyconfigs.kms.cnrm.cloud.google.com
+  name: kmskeyhandles.kms.cnrm.cloud.google.com
 spec:
   group: kms.cnrm.cloud.google.com
   names:
     categories:
     - gcp
-    kind: KMSAutokeyConfig
-    listKind: KMSAutokeyConfigList
-    plural: kmsautokeyconfigs
-    singular: kmsautokeyconfig
+    kind: KMSKeyHandle
+    listKind: KMSKeyHandleList
+    plural: kmskeyhandles
+    shortNames:
+    - gcpkmskeyhandle
+    - gcpkmskeyhandles
+    singular: kmskeyhandle
   preserveUnknownFields: false
   scope: Namespaced
   versions:
@@ -39,7 +42,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: KMSAutokeyConfig is the Schema for the KMSAutokeyConfig API
+        description: KMSKeyHandle is the Schema for the KMSKeyHandle API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -54,81 +57,19 @@ spec:
           metadata:
             type: object
           spec:
-            description: KMSAutokeyConfigSpec defines the desired state of KMSAutokeyConfig
+            description: KMSKeyHandleSpec defines the desired state of KMSKeyHandle
             properties:
-              folderRef:
-                description: Immutable. The folder that this resource belongs to.
-                oneOf:
-                - not:
-                    required:
-                    - external
-                  required:
-                  - name
-                - not:
-                    anyOf:
-                    - required:
-                      - name
-                    - required:
-                      - namespace
-                  required:
-                  - external
-                properties:
-                  external:
-                    description: The 'name' field of a folder, when not managed by
-                      Config Connector. This field must be set when 'name' field is
-                      not set.
-                    type: string
-                  name:
-                    description: The 'name' field of a 'Folder' resource. This field
-                      must be set when 'external' field is not set.
-                    type: string
-                  namespace:
-                    description: The 'namespace' field of a 'Folder' resource. If
-                      unset, the namespace is defaulted to the namespace of the referencer
-                      resource.
-                    type: string
-                type: object
-              keyProject:
-                description: The Project that this resource belongs to.
-                oneOf:
-                - not:
-                    required:
-                    - external
-                  required:
-                  - name
-                  - kind
-                - not:
-                    anyOf:
-                    - required:
-                      - name
-                    - required:
-                      - namespace
-                    - required:
-                      - kind
-                  required:
-                  - external
-                properties:
-                  external:
-                    description: The `projectID` field of a project, when not managed
-                      by Config Connector.
-                    type: string
-                  kind:
-                    description: The kind of the Project resource; optional but must
-                      be `Project` if provided.
-                    type: string
-                  name:
-                    description: The `name` field of a `Project` resource.
-                    type: string
-                  namespace:
-                    description: The `namespace` field of a `Project` resource.
-                    type: string
-                type: object
-            required:
-            - folderRef
+              resourceID:
+                description: Immutable. The KMSKeyHandle name. If not given, the metadata.name
+                  will be used.
+                type: string
+                x-kubernetes-validations:
+                - message: ResourceID field is immutable
+                  rule: self == oldSelf
             type: object
           status:
-            description: KMSAutokeyConfigStatus defines the config connector machine
-              state of KMSAutokeyConfig
+            description: KMSKeyHandleStatus defines the config connector machine state
+              of KMSKeyHandle
             properties:
               conditions:
                 description: Conditions represent the latest available observations
@@ -157,8 +98,7 @@ spec:
                   type: object
                 type: array
               externalRef:
-                description: A unique specifier for the KMSAutokeyConfig resource
-                  in GCP.
+                description: A unique specifier for the KMSKeyHandle resource in GCP.
                 type: string
               observedGeneration:
                 description: ObservedGeneration is the generation of the resource
@@ -171,12 +111,10 @@ spec:
               observedState:
                 description: ObservedState is the state of the resource as most recently
                   observed in GCP.
-                properties:
-                  state:
-                    description: Output only. Current state of this AutokeyConfig.
-                    type: string
                 type: object
             type: object
+        required:
+        - spec
         type: object
     served: true
     storage: true
