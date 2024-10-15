@@ -12,16 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: redis.cnrm.cloud.google.com/v1alpha1
-kind: RedisCluster
+apiVersion: dataform.cnrm.cloud.google.com/v1beta1
+kind: DataformRepository
 metadata:
-  name: rediscluster-${uniqueId}
+  name: dataformrepository-${uniqueId}
 spec:
-  location: us-central1
   projectRef:
     external: ${projectId}
-  shardCount: 3
-  replicaCount: 1
-  pscConfigs:
-  - networkRef:
-      name: network-${uniqueId}
+  region: us-west2
