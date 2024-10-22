@@ -1,0 +1,20 @@
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  name: autokeyfolder-${uniqueId}
+spec:
+  displayName: autokeyfolder-${uniqueId}
+  folderRef:
+    external: ${TEST_FOLDER_ID}
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Project
+metadata:
+  annotations:
+    cnrm.cloud.google.com/deletion-policy: "abandon"
+  name: kmsproject-${uniqueId}
+spec:
+  resourceID: kmsproject-${uniqueId}
+  name: kmsproject-${uniqueId}
+  folderRef:
+    external: autokeyfolder-${uniqueId}
