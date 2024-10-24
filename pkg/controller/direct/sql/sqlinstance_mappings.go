@@ -23,17 +23,12 @@ import (
 	refs "github.com/GoogleCloudPlatform/k8s-config-connector/apis/refs/v1beta1"
 	krm "github.com/GoogleCloudPlatform/k8s-config-connector/apis/sql/v1beta1"
 	"github.com/GoogleCloudPlatform/k8s-config-connector/pkg/controller/direct"
+	"github.com/GoogleCloudPlatform/k8s-config-connector/pkg/label"
 )
 
 func SQLInstanceKRMToGCP(in *krm.SQLInstance) (*api.DatabaseInstance, error) {
 	if in == nil {
 		return nil, fmt.Errorf("cannot convert nil KRM SQLInstance to GCP DatabaseInstance")
-	}
-
-	if in.Spec.CloneSource != nil {
-		// If spec.cloneSource is specified, it's invalid to convert krm.SQLInstance -> api.DatabaseInstance.
-		// Instead, the krm.SQLInstance should be converted to an api.InstancesCloneRequest.
-		return nil, fmt.Errorf("cannot convert SQLInstance with CloneSource specified")
 	}
 
 	out := &api.DatabaseInstance{
@@ -55,6 +50,9 @@ func SQLInstanceKRMToGCP(in *krm.SQLInstance) (*api.DatabaseInstance, error) {
 		// SqlNetworkArchitecture is not supported in KRM API.
 		// SwitchTransactionLogsToCloudStorageEnabled is not supported in KRM API.
 	}
+
+	// Here be dragons.
+	ApplySQLInstanceGCPDefaults(in, out)
 
 	return out, nil
 }
@@ -146,7 +144,7 @@ func InstanceSettingsKRMToGCP(in krm.InstanceSettings, labels map[string]string)
 		StorageAutoResizeLimit: direct.ValueOf(in.DiskAutoresizeLimit),
 		Tier:                   in.Tier,
 		TimeZone:               direct.ValueOf(in.TimeZone),
-		UserLabels:             labels,
+		UserLabels:             label.NewGCPLabelsFromK8sLabels(labels),
 	}
 
 	if in.CrashSafeReplication != nil {
@@ -549,7 +547,7 @@ func SQLInstanceCloneKRMToGCP(in *krm.SQLInstance) (*api.InstancesCloneRequest, 
 	if in.Spec.CloneSource == nil {
 		// If spec.cloneSource is not specified, it's invalid to convert krm.SQLInstance -> api.InstancesCloneRequest.
 		// Instead, the krm.SQLInstance should be converted to an api.DatabaseInstance.
-		return nil, fmt.Errorf("cannot convert SQLInstance without CloneSource specified")
+		return nil, fmt.Errorf("cannot convert SQLInstance to InstancesCloneRequest without CloneSource specified")
 	}
 
 	out := &api.InstancesCloneRequest{

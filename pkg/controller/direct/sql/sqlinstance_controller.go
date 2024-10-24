@@ -108,7 +108,7 @@ func (m *sqlInstanceModel) AdapterForObject(ctx context.Context, kube client.Rea
 		return nil, fmt.Errorf("building gcp client: %w", err)
 	}
 
-	if err := NormalizeSQLInstance(ctx, kube, obj); err != nil {
+	if err := ResolveSQLInstanceRefs(ctx, kube, obj); err != nil {
 		return nil, err
 	}
 
@@ -387,6 +387,8 @@ func (a *sqlInstanceAdapter) Update(ctx context.Context, updateOp *directbase.Up
 	}
 
 	if !InstancesMatch(desiredGCP, a.actual) {
+		updateOp.RecordUpdatingEvent()
+
 		// GCP API requires we set the current settings version, otherwise update will fail.
 		desiredGCP.Settings.SettingsVersion = a.actual.Settings.SettingsVersion
 
