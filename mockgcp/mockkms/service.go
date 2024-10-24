@@ -31,9 +31,10 @@ import (
 // MockService represents a mocked kms service.
 type MockService struct {
 	*common.MockEnvironment
-	storage    storage.Storage
-	operations *operations.Operations
-	v1         *autokeyAdminServer
+	storage         storage.Storage
+	operations      *operations.Operations
+	v1              *autokeyAdminServer
+	v1AutokeyServer *autokeyServer
 }
 
 // New creates a MockService.
@@ -44,6 +45,7 @@ func New(env *common.MockEnvironment, storage storage.Storage) *MockService {
 		operations:      operations.NewOperationsService(storage),
 	}
 	s.v1 = &autokeyAdminServer{MockService: s}
+	s.v1AutokeyServer = &autokeyServer{MockService: s}
 	return s
 }
 
@@ -54,14 +56,15 @@ func (s *MockService) ExpectedHosts() []string {
 func (s *MockService) Register(grpcServer *grpc.Server) {
 	pb.RegisterKeyManagementServiceServer(grpcServer, &kmsServer{MockService: s})
 	pb.RegisterAutokeyAdminServer(grpcServer, s.v1)
+	pb.RegisterAutokeyServer(grpcServer, s.v1AutokeyServer)
 }
 
 func (s *MockService) NewHTTPMux(ctx context.Context, conn *grpc.ClientConn) (http.Handler, error) {
 	mux, err := httpmux.NewServeMux(ctx, conn, httpmux.Options{},
 		pb.RegisterKeyManagementServiceHandler,
 		pb.RegisterAutokeyAdminHandler,
-		// TODO: Any LROs on this API?
-		//	s.operations.RegisterOperationsPath("/v1/{prefix=**}/operations/{name}"),
+		pb.RegisterAutokeyHandler,
+		s.operations.RegisterOperationsPath("/v1/{prefix=**}/operations/{name}"),
 	)
 	if err != nil {
 		return nil, err

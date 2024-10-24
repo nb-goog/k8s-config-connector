@@ -15,9 +15,10 @@
 apiVersion: kms.cnrm.cloud.google.com/v1alpha1
 kind: KMSKeyHandle
 metadata:
-  name: keyhandle-${uniqueId}
+  name: keyhandle-4
 spec:
+  resourceID: keyhandle-4
   projectRef:
-    external: projects/${projectId}
-  locationl: us-central1
+    external: projects/autokey-resource
+  location: us-central1
   resourceTypeSelector: compute.googleapis.com/Disk

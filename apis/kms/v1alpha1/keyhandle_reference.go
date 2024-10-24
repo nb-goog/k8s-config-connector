@@ -33,7 +33,7 @@ var _ refsv1beta1.ExternalNormalizer = &KMSKeyHandleRef{}
 // holds the GCP identifier for the KRM object.
 type KMSKeyHandleRef struct {
 	// A reference to an externally managed KMSKeyHandle resource.
-	// Should be in the format "projects/<projectID>/locations/<location>/keyhandles/<keyhandleID>".
+	// Should be in the format "projects/<projectID>/locations/<location>/keyHandles/<keyhandleID>".
 	External string `json:"external,omitempty"`
 
 	// The name of a KMSKeyHandle resource.
@@ -161,13 +161,13 @@ func (p *KMSKeyHandleParent) String() string {
 }
 
 func AsKMSKeyHandleExternal(parent *KMSKeyHandleParent, resourceID string) (external string) {
-	return parent.String() + "/keyhandles/" + resourceID
+	return parent.String() + "/keyHandles/" + resourceID
 }
 
 func ParseKMSKeyHandleExternal(external string) (parent *KMSKeyHandleParent, resourceID string, err error) {
 	external = strings.TrimPrefix(external, "/")
 	tokens := strings.Split(external, "/")
-	if len(tokens) != 6 || tokens[0] != "projects" || tokens[2] != "locations" || tokens[4] != "keyHandle" {
+	if len(tokens) != 6 || tokens[0] != "projects" || tokens[2] != "locations" || tokens[4] != "keyHandles" {
 		return nil, "", fmt.Errorf("format of KMSKeyHandle external=%q was not known (use projects/<projectId>/locations/<location>/keyHandles/<keyhandleID>)", external)
 	}
 	parent = &KMSKeyHandleParent{
@@ -188,7 +188,7 @@ func AsKMSKeyHandleExternal_FromSpec(spec *KMSKeyHandleSpec) (parent *KMSKeyHand
 		ProjectID: tokens[1],
 		Location:  valueOf(spec.Location),
 	}
-	return parent, *spec.ResourceID, nil
+	return parent, valueOf(spec.ResourceID), nil
 }
 
 func valueOf[T any](t *T) T {
