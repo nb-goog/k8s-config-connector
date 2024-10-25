@@ -60,13 +60,6 @@ type KMSAutokeyConfigSpec struct {
 	/* The Project that this resource belongs to. */
 	// +optional
 	KeyProject *AutokeyconfigKeyProject `json:"keyProject,omitempty"`
-
-	/* Immutable. The KMSAutokeyConfig name. If not given, the metadata.name will be used. */
-	// +optional
-	ResourceID *string `json:"resourceID,omitempty"`
-
-	// +optional
-	State *string `json:"state,omitempty"`
 }
 
 type AutokeyconfigObservedStateStatus struct {
@@ -94,7 +87,7 @@ type KMSAutokeyConfigStatus struct {
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +kubebuilder:resource:categories=gcp,shortName=
+// +kubebuilder:resource:categories=gcp,shortName=gcpkmsautokeyconfig;gcpkmsautokeyconfigs
 // +kubebuilder:subresource:status
 // +kubebuilder:metadata:labels="cnrm.cloud.google.com/managed-by-kcc=true";"cnrm.cloud.google.com/system=true"
 // +kubebuilder:printcolumn:name="Age",JSONPath=".metadata.creationTimestamp",type="date"
