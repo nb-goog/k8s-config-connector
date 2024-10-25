@@ -24,5 +24,4 @@ status:
     type: Ready
   externalRef: projects/autokey-resource/locations/us-central1/keyHandles/keyhandle-4
   observedGeneration: 1
-  observedState:
-    kmsKey: projects/${projectId}/locations/us-central1/keyRings/autokey/cryptoKeys/190012159962-compute-disk-874a3e9203fe050f
+  observedState: {}

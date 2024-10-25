@@ -15,8 +15,6 @@
 package keyhandle
 
 import (
-	"fmt"
-
 	pb "cloud.google.com/go/kms/apiv1/kmspb"
 	krm "github.com/GoogleCloudPlatform/k8s-config-connector/apis/kms/v1alpha1"
 	refs "github.com/GoogleCloudPlatform/k8s-config-connector/apis/refs/v1beta1"
@@ -41,17 +39,12 @@ func KMSKeyHandleSpec_FromProto(mapCtx *direct.MapContext, in *pb.KeyHandle) *kr
 	return out
 }
 
-func KMSKeyHandleSpec_ToProto(mapCtx *direct.MapContext, in *krm.KMSKeyHandleSpec) *pb.KeyHandle {
-	fmt.Printf("Inside spec converter :%v", in)
+func KMSKeyHandleSpec_ToProto(mapCtx *direct.MapContext, in *krm.KMSKeyHandleSpec, id *krm.KMSKeyHandleRef) *pb.KeyHandle {
 	if in == nil {
 		return nil
 	}
 	out := &pb.KeyHandle{}
-	parent, resourceID, err := krm.AsKMSKeyHandleExternal_FromSpec(in)
-	if err != nil {
-		return nil
-	}
-	out.Name = krm.AsKMSKeyHandleExternal(parent, resourceID)
+	out.Name = id.External
 	out.ResourceTypeSelector = *in.ResourceTypeSelector
 	return out
 }
@@ -68,7 +61,6 @@ func KeyHandle_FromProto(mapCtx *direct.MapContext, in *pb.KeyHandle) *krm.KeyHa
 	return out
 }
 func KeyHandle_ToProto(mapCtx *direct.MapContext, in *krm.KeyHandle) *pb.KeyHandle {
-	fmt.Printf("Inside keyhandle converter :%v", in)
 	if in == nil {
 		return nil
 	}

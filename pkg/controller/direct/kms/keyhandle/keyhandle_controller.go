@@ -71,12 +71,10 @@ func (m *model) client(ctx context.Context) (*gcp.AutokeyClient, error) {
 }
 
 func (m *model) AdapterForObject(ctx context.Context, reader client.Reader, u *unstructured.Unstructured) (directbase.Adapter, error) {
-	fmt.Printf("unstructured : %v", u)
 	obj := &krm.KMSKeyHandle{}
 	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(u.Object, &obj); err != nil {
 		return nil, fmt.Errorf("error converting to %T: %w", obj, err)
 	}
-	fmt.Printf("Object received: %v", obj)
 
 	id, err := krm.NewKMSKeyHandleRef(ctx, reader, obj)
 	if err != nil {
@@ -127,14 +125,12 @@ func (a *Adapter) Find(ctx context.Context) (bool, error) {
 }
 
 func (a *Adapter) Create(ctx context.Context, createOp *directbase.CreateOperation) error {
-	u := createOp.GetUnstructured()
-
 	log := klog.FromContext(ctx).WithName(ctrlName)
 	log.V(2).Info("creating KeyHandle", "name", a.id.External)
 	mapCtx := &direct.MapContext{}
 
 	desired := a.desired.DeepCopy()
-	resource := KMSKeyHandleSpec_ToProto(mapCtx, &desired.Spec)
+	resource := KMSKeyHandleSpec_ToProto(mapCtx, &desired.Spec, a.id)
 	if mapCtx.Err() != nil {
 		return mapCtx.Err()
 	}
@@ -163,18 +159,11 @@ func (a *Adapter) Create(ctx context.Context, createOp *directbase.CreateOperati
 		return mapCtx.Err()
 	}
 	status.ExternalRef = &a.id.External
-	return setStatus(u, status)
+	return createOp.UpdateStatus(ctx, status, nil)
 }
 
 func (a *Adapter) Update(ctx context.Context, updateOp *directbase.UpdateOperation) error {
-	// NOTE: KeyHandle does not support update operation. So this api is a no-op
-	u := updateOp.GetUnstructured()
-
-	log := klog.FromContext(ctx).WithName(ctrlName)
-	log.V(2).Info("updating KeyHandle", "name", a.id.External)
-
-	status := &krm.KMSKeyHandleStatus{}
-	return setStatus(u, status)
+	return fmt.Errorf("update operation not supported for KeyHandle resource")
 }
 
 func (a *Adapter) Export(ctx context.Context) (*unstructured.Unstructured, error) {
@@ -207,24 +196,7 @@ func (a *Adapter) Export(ctx context.Context) (*unstructured.Unstructured, error
 func (a *Adapter) Delete(ctx context.Context, deleteOp *directbase.DeleteOperation) (bool, error) {
 	// NOTE: KeyHandle does not support delete operation, so this api is a no-op
 	log := klog.FromContext(ctx).WithName(ctrlName)
-	log.V(2).Info("deleting KeyHandle", "name", a.id.External)
+	log.V(2).Info("delete operation on KeyHandle resource not supported", "name", a.id.External)
+
 	return false, nil
-}
-
-func setStatus(u *unstructured.Unstructured, typedStatus any) error {
-	status, err := runtime.DefaultUnstructuredConverter.ToUnstructured(typedStatus)
-	if err != nil {
-		return fmt.Errorf("error converting status to unstructured: %w", err)
-	}
-
-	old, _, _ := unstructured.NestedMap(u.Object, "status")
-	if old != nil {
-		status["conditions"] = old["conditions"]
-		status["observedGeneration"] = old["observedGeneration"]
-		status["externalRef"] = old["externalRef"]
-	}
-
-	u.Object["status"] = status
-
-	return nil
 }
