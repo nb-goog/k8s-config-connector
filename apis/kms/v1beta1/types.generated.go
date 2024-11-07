@@ -14,6 +14,10 @@
 
 package v1beta1
 
+import (
+	refs "github.com/GoogleCloudPlatform/k8s-config-connector/apis/refs/v1beta1"
+)
+
 // +kcc:proto=google.cloud.kms.v1.CryptoKey
 type CryptoKey struct {
 	// Output only. The resource name for this
@@ -499,37 +503,6 @@ type EkmConnection_ServiceResolver struct {
 	ServerCertificates []Certificate `json:"serverCertificates,omitempty"`
 }
 
-// +kcc:proto=google.cloud.kms.v1.CreateKeyHandleMetadata
-type CreateKeyHandleMetadata struct {
-}
-
-// +kcc:proto=google.cloud.kms.v1.KeyHandle
-type KeyHandle struct {
-	// Identifier. Name of the [KeyHandle][google.cloud.kms.v1.KeyHandle]
-	//  resource, e.g.
-	//  `projects/{PROJECT_ID}/locations/{LOCATION}/keyHandles/{KEY_HANDLE_ID}`.
-	Name *string `json:"name,omitempty"`
-
-	// Output only. Name of a [CryptoKey][google.cloud.kms.v1.CryptoKey] that has
-	//  been provisioned for Customer Managed Encryption Key (CMEK) use in the
-	//  [KeyHandle][google.cloud.kms.v1.KeyHandle] project and location for the
-	//  requested resource type. The [CryptoKey][google.cloud.kms.v1.CryptoKey]
-	//  project will reflect the value configured in the
-	//  [AutokeyConfig][google.cloud.kms.v1.AutokeyConfig] on the resource
-	//  project's ancestor folder at the time of the
-	//  [KeyHandle][google.cloud.kms.v1.KeyHandle] creation. If more than one
-	//  ancestor folder has a configured
-	//  [AutokeyConfig][google.cloud.kms.v1.AutokeyConfig], the nearest of these
-	//  configurations is used.
-	KmsKey *string `json:"kmsKey,omitempty"`
-
-	// Required. Indicates the resource type that the resulting
-	//  [CryptoKey][google.cloud.kms.v1.CryptoKey] is meant to protect, e.g.
-	//  `{SERVICE}.googleapis.com/{TYPE}`. See documentation for supported resource
-	//  types.
-	ResourceTypeSelector *string `json:"resourceTypeSelector,omitempty"`
-}
-
 // +kcc:proto=google.cloud.kms.v1.Digest
 type Digest struct {
 	// A message digest produced with the SHA-256 algorithm.
@@ -574,5 +547,35 @@ type AutokeyConfig struct {
 	//  Cloud KMS Service Agent for this key project must be granted the
 	//  `cloudkms.admin` role (or pertinent permissions). A request with an empty
 	//  key project field will clear the configuration.
-	KeyProject *string `json:"keyProject,omitempty"`
+	KeyProject *refs.ProjectRef `json:"keyProject,omitempty"`
+
+	// Output only. The state for the AutokeyConfig.
+	State *string `json:"state,omitempty"`
+}
+
+// +kcc:proto=google.cloud.kms.v1.KeyHandle
+type KeyHandle struct {
+	// Identifier. Name of the [KeyHandle][google.cloud.kms.v1.KeyHandle]
+	//  resource, e.g.
+	//  `projects/{PROJECT_ID}/locations/{LOCATION}/keyHandles/{KEY_HANDLE_ID}`.
+	Name *string `json:"name,omitempty"`
+
+	// Output only. Name of a [CryptoKey][google.cloud.kms.v1.CryptoKey] that has
+	//  been provisioned for Customer Managed Encryption Key (CMEK) use in the
+	//  [KeyHandle][google.cloud.kms.v1.KeyHandle] project and location for the
+	//  requested resource type. The [CryptoKey][google.cloud.kms.v1.CryptoKey]
+	//  project will reflect the value configured in the
+	//  [AutokeyConfig][google.cloud.kms.v1.AutokeyConfig] on the resource
+	//  project's ancestor folder at the time of the
+	//  [KeyHandle][google.cloud.kms.v1.KeyHandle] creation. If more than one
+	//  ancestor folder has a configured
+	//  [AutokeyConfig][google.cloud.kms.v1.AutokeyConfig], the nearest of these
+	//  configurations is used.
+	KmsKey *string `json:"kmsKey,omitempty"`
+
+	// Required. Indicates the resource type that the resulting
+	//  [CryptoKey][google.cloud.kms.v1.CryptoKey] is meant to protect, e.g.
+	//  `{SERVICE}.googleapis.com/{TYPE}`. See documentation for supported resource
+	//  types.
+	ResourceTypeSelector *string `json:"resourceTypeSelector,omitempty"`
 }
