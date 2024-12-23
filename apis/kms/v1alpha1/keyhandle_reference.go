@@ -42,7 +42,7 @@ type KMSKeyHandleRef struct {
 	// The namespace of a KMSKeyHandle resource.
 	Namespace string `json:"namespace,omitempty"`
 
-	parent *KMSKeyHandleParent
+	parent *KMSKeyHandleParent `json:"parent, omitempty"`
 }
 
 // NormalizedExternal provision the "External" value for other resource that depends on KMSKeyHandle.

@@ -42,7 +42,7 @@ type KMSAutokeyConfigRef struct {
 	// The namespace of a KMSAutokeyConfig resource.
 	Namespace string `json:"namespace,omitempty"`
 
-	parent *KMSAutokeyConfigParent
+	parent *KMSAutokeyConfigParent `json:"parent,omitempty"`
 }
 
 // NormalizedExternal provision the "External" value for other resource that depends on KMSAutokeyConfig.
